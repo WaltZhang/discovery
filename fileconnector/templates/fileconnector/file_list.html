@@ -1,0 +1,10 @@
+{% extends 'fileconnector/base.html' %}
+{% block body %}
+    <div>
+    {% for obj in object_list %}
+        <a href="{% url 'files:detail' obj.id %}">
+        {{ obj.title }} - {{ obj.id }}</a>
+        {{ obj.file }}<br/>
+    {% endfor %}
+    </div>
+{% endblock %}
