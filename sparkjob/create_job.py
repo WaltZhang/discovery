@@ -24,10 +24,15 @@ def create_df_job(name, path, schema):
     text = json.loads(schema)
     print(text)
     for title in text:
-        field = StructField(title.get('name'), switcher.get(title.get('type'))())
+        type = switcher.get(title.get('type'))
+        if type is None:
+            type = title.get('type')
+        field = StructField(title.get('name'), type())
         fields.append(field)
     df = spark.read.csv(path, schema=StructType(fields))
-    df.write.saveAsTable()
+    df.printSchema()
+    df.show()
+    df.write.saveAsTable(name)
     # df.write.parquet(os.path.join(settings.DATA_WAREHOUSE_HOME, name))
 
 

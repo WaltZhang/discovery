@@ -1,7 +1,4 @@
-import csv
-import uuid
-
-import requests
+import csv, json, uuid, requests
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -24,10 +21,10 @@ def file_list(request):
 
 def file_detail(request, id):
     instance = get_object_or_404(FileModel, id=id)
-    meta_str, data = read_csv(instance.file.path)
+    meta, data = read_csv(instance.file.path)
     context = {
         'instance': instance,
-        'meta_str': meta_str,
+        'meta_str': meta,
         'data': data
     }
     return render(request, 'fileconnector/file_detail.html', context)
@@ -64,7 +61,9 @@ def file_edit(request, id):
 
 
 def create_data_set(request, metadata, file, description):
-    data = {'name': str(uuid.uuid1()), 'schema': metadata, 'path': file, 'description': description}
+    name = str(uuid.uuid1())
+    name = name.replace('-', '_')
+    data = {'name': name, 'schema': metadata, 'path': file, 'description': description}
     scheme = request.is_secure() and 'https' or 'http'
     domain = get_current_site(request)
     url = scheme + '://' + str(domain) + '/spark/create/'
@@ -76,7 +75,7 @@ def read_csv(path):
     with open(path) as csv_file:
         reader = csv.reader(csv_file)
         header = next(reader)
-        cols = [{title: 'StringType'} for title in header]
+        cols = [{'name': title, 'type': 'string'} for title in header]
         for row in csv_file:
             rows.append(row)
         return cols, rows
