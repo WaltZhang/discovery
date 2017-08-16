@@ -1,4 +1,6 @@
-import json, sys, uuid
+import json
+import sys
+import uuid
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
@@ -19,7 +21,7 @@ switcher = {
 
 
 def create_df_job(name, path, schema):
-    spark = SparkSession.builder.appName(name).getOrCreate()
+    spark = SparkSession.builder.appName(name).enableHiveSupport().getOrCreate()
     fields = []
     text = json.loads(schema)
     print(text)
@@ -33,6 +35,8 @@ def create_df_job(name, path, schema):
     df.printSchema()
     df.show()
     df.write.saveAsTable(name)
+    spark.sql('show databases').show()
+    spark.sql('show tables').show()
     # df.write.parquet(os.path.join(settings.DATA_WAREHOUSE_HOME, name))
 
 

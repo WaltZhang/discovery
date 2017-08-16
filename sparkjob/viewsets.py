@@ -1,5 +1,5 @@
-import json
 import os
+from subprocess import Popen
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -25,11 +25,9 @@ def create_entity(request):
 
 def create_job(job_py, name, path, schema):
     schema = schema.replace('\'', '\"')
-    cmd = os.path.join(settings.SPARK_HOME, 'bin/spark-submit') \
-          + " --master " + settings.SPARK_MASTER \
-          + " --name " + name \
-          + " " + job_py \
-          + " '" + name \
-          + "' 'file:" + path \
-          + "' '" + schema + "'"
-    os.system(cmd)
+    Popen([os.path.join(settings.SPARK_HOME, 'bin/spark-submit'),
+           '--master', settings.SPARK_MASTER,
+           '--name', name,
+           job_py, name,
+           'file:' + path,
+           '"' + schema + '"'])
