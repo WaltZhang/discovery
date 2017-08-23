@@ -1,5 +1,5 @@
 import os
-from subprocess import Popen
+import subprocess
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -11,7 +11,6 @@ from sparkjob.serializers import JobSerializer
 
 @api_view(['POST'])
 def create_entity(request):
-    # data = JSONParser().parse(request)
     serializer = JobSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -25,9 +24,12 @@ def create_entity(request):
 
 def create_job(job_py, name, path, schema):
     schema = schema.replace('\'', '\"')
-    Popen([os.path.join(settings.SPARK_HOME, 'bin/spark-submit'),
+    cmd = [os.path.join(settings.SPARK_HOME, 'bin/spark-submit'),
            '--master', settings.SPARK_MASTER,
            '--name', name,
            job_py, name,
            'file:' + path,
-           '"' + schema + '"'])
+           '' + schema + '']
+    subprocess.Popen(cmd)
+    # with open('/tmp/' + name, mode='w') as tmp_output:
+    #     subprocess.Popen(cmd, stdout=tmp_output, stderr=subprocess.STDOUT)

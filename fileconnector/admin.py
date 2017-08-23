@@ -2,14 +2,8 @@ from django.contrib import admin
 
 from django.contrib.admin import ModelAdmin
 
-from fileconnector.models import FileModel, MetadataModel
+from fileconnector.models import FileModel
 from sparkjob.models import JobModel
-
-
-class MetadataModelAdmin(ModelAdmin):
-    list_display = ['file', 'description', 'metadata', 'timestamp', 'updated']
-    class Meta:
-        model = MetadataModel
 
 
 class FileConnectorModelAdmin(ModelAdmin):
@@ -25,5 +19,4 @@ class JobModelAdmin(ModelAdmin):
 
 
 admin.site.register(FileModel, FileConnectorModelAdmin)
-admin.site.register(MetadataModel, MetadataModelAdmin)
 admin.site.register(JobModel, JobModelAdmin)

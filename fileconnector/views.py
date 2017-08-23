@@ -35,11 +35,6 @@ def file_create(request):
     if form.is_valid():
         instance = form.save(commit=False)
         instance.save()
-        # meta_str = read_file(instance.file.path)
-        # meta = MetadataModel(description=instance.description,
-        #                      file=instance.file,
-        #                      metadata=meta_str)
-        # meta.save()
         return redirect(reverse('files:detail', args=[instance.id]))
     context = {
         'form': form

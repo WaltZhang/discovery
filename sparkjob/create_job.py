@@ -1,6 +1,5 @@
 import json
 import sys
-import uuid
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
@@ -37,13 +36,6 @@ def create_df_job(name, path, schema):
     df.write.saveAsTable(name)
     spark.sql('show databases').show()
     spark.sql('show tables').show()
-    # df.write.parquet(os.path.join(settings.DATA_WAREHOUSE_HOME, name))
-
-
-def persist_df(df, format='parquet'):
-    table_name = uuid.uuid1()
-    df.withColumn(uuid, )
-    df.write.saveAsTable(table_name, format=format)
 
 
 if __name__ == '__main__':
