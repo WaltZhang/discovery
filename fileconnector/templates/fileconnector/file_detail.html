@@ -1,10 +1,10 @@
 {% extends 'fileconnector/base.html' %}
 {% block body %}
-    <form method="post" action="{% url 'files:list' %}">
+    <form method="post" action="{% url 'spark:list' %}">
         {% csrf_token %}
         <textarea id="metadata" name="metadata">{{ meta_str }}</textarea><br>
         <input type="type" id="description" name="description" value="{{ instance.description }}"><br>
-        <input type="type" id="file" name="file" value="{{ instance.file.path }}"><br>
+        <input type="type" id="file" name="file" value="{{ instance.file.name }}"><br>
         <label id="data" name="data">{{ data }}</label><br>
         <input type="submit" value="Create Data Set"><br>
     </form>

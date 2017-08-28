@@ -30,7 +30,7 @@ def file_detail(request, id):
     return render(request, 'fileconnector/file_detail.html', context)
 
 
-def file_create(request):
+def file_upload(request):
     form = FileForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         instance = form.save(commit=False)
@@ -61,7 +61,7 @@ def create_data_set(request, metadata, file, description):
     data = {'name': name, 'schema': metadata, 'path': file, 'description': description}
     scheme = request.is_secure() and 'https' or 'http'
     domain = get_current_site(request)
-    url = scheme + '://' + str(domain) + '/spark/create/'
+    url = scheme + '://' + str(domain) + '/spark/'
     requests.post(url=url, json=data)
 
 

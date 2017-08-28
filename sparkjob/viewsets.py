@@ -1,8 +1,8 @@
 import os
+import multiprocessing
 import subprocess
+import uuid
 
-from django.http import HttpResponse
-from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
@@ -18,21 +18,23 @@ def entity_list(request):
     if request.method == 'GET':
         entities = JobModel.objects.all()
         serializer = JobSerializer(entities, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        return Response(serializer.data)
     elif request.method == 'POST':
         data = JSONParser().parse(request)
         serializer = JobSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            name = serializer.data.get('name')
-            path = serializer.data.get('path')
-            schema = serializer.data.get('schema')
-            create_job(os.path.join(settings.BASE_DIR, 'sparkjob/create_job.py'), name, path, schema)
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-    entities = JobModel.objects.all()
-    serializer = JobSerializer(entities, many=True)
-    return Response(serializer.data)
+
+            name = str(uuid.uuid1())
+            name = name.replace('-', '_')
+            description = serializer.data.get('description')
+            metadata = serializer.data.get('metadata')
+            file = serializer.data.get('file')
+            schema = {'name': name, 'schema': metadata, 'description': description}
+
+            create_job(os.path.join(settings.BASE_DIR, 'sparkjob/create_job.py'), name, os.path.join(settings.MEDIA_ROOT, file), schema)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -40,33 +42,20 @@ def entity_detail(request, id):
     try:
         entity = JobModel.objects.get(id=id)
     except JobModel.DoesNotExist:
-        return HttpResponse(status=404)
+        return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         serializer = JobSerializer(entity)
-        return JsonResponse(serializer.data)
+        return Response(serializer.data)
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
         serializer = JobSerializer(entity, data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'DELETE':
         entity.delete()
-        return HttpResponse(status=204)
-
-
-@api_view(['GET', 'POST', 'UPDATE', 'DELETE'])
-def create_entity(request):
-    serializer = JobSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        name = serializer.data.get('name')
-        path = serializer.data.get('path')
-        schema = serializer.data.get('schema')
-        create_job(os.path.join(settings.BASE_DIR, 'sparkjob/create_job.py'), name, path, schema)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 def create_job(job_py, name, path, schema):
@@ -77,6 +66,29 @@ def create_job(job_py, name, path, schema):
            job_py, name,
            'file:' + path,
            '' + schema + '']
-    subprocess.Popen(cmd)
+    popenAndCall(on_exit, cmd)
     # with open('/tmp/' + name, mode='w') as tmp_output:
     #     subprocess.Popen(cmd, stdout=tmp_output, stderr=subprocess.STDOUT)
+
+
+
+def popenAndCall(onExit, *popenArgs):
+    """
+    Runs the given args in a subprocess.Popen, and then calls the function
+    onExit when the subprocess completes.
+    onExit is a callable object, and popenArgs is a list/tuple of args that
+    would give to subprocess.Popen.
+    """
+    def runInThread(onExit, popenArgs):
+        proc = subprocess.Popen(popenArgs)
+        proc.wait()
+        onExit()
+        return
+    process = multiprocessing.Process(target=runInThread, args=(onExit, *popenArgs))
+    process.start()
+    # returns immediately after the thread starts
+    return process
+
+
+def on_exit():
+    print("On Exit...")
