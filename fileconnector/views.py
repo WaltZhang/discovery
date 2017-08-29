@@ -8,10 +8,6 @@ from fileconnector.models import FileModel
 
 
 def file_list(request):
-    metadata = request.POST.get('metadata')
-    file = request.POST.get('file')
-    description = request.POST.get('description')
-    create_data_set(request, metadata, file, description)
     queryset = FileModel.objects.all()
     context = {
         'object_list': queryset
@@ -25,7 +21,7 @@ def file_detail(request, id):
     context = {
         'instance': instance,
         'meta_str': meta,
-        'uuid': uuid.uuid1(),
+        'uuid': uuid.uuid1().replace('-', '_'),
         'data': data
     }
     return render(request, 'fileconnector/file_detail.html', context)
@@ -54,16 +50,6 @@ def file_edit(request, id):
         'form': form
     }
     return render(request, 'fileconnector/form.html', context)
-
-
-def create_data_set(request, metadata, file, description):
-    name = str(uuid.uuid1())
-    name = name.replace('-', '_')
-    data = {'name': name, 'schema': metadata, 'path': file, 'description': description}
-    scheme = request.is_secure() and 'https' or 'http'
-    domain = get_current_site(request)
-    url = scheme + '://' + str(domain) + '/spark/'
-    requests.post(url=url, json=data)
 
 
 def read_csv(path):

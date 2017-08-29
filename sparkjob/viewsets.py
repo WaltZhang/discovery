@@ -5,7 +5,6 @@ import subprocess
 
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from discovery import settings
@@ -25,10 +24,8 @@ def entity_list(request):
             serializer.save()
 
             name = serializer.data.get('name')
-            description = serializer.data.get('description')
             schema = serializer.data.get('schema')
             file = serializer.data.get('file')
-            schema = {'name': name, 'schema': schema, 'description': description}
 
             create_job(os.path.join(settings.BASE_DIR, 'sparkjob/create_job.py'), name,
                        os.path.join(settings.MEDIA_ROOT, file), schema)
@@ -60,19 +57,19 @@ def entity_detail(request, id):
 
 def create_job(job_py, name, path, schema):
     schema_str = json.dumps(schema)
-    schema_str = schema_str.replace('\'', '\"')
+    # schema_str = schema_str.replace('\'', '\\\\\"')
     cmd = [os.path.join(settings.SPARK_HOME, 'bin/spark-submit'),
            '--master', settings.SPARK_MASTER,
            '--name', name,
            job_py, name,
            'file:' + path,
-           schema_str]
-    popenAndCall(on_exit, cmd)
-    # with open('/tmp/' + name, mode='w') as tmp_output:
-    #     subprocess.Popen(cmd, stdout=tmp_output, stderr=subprocess.STDOUT)
+           '' + schema_str + '']
+    # popenAndCall(on_exit, cmd)
+    with open('/tmp/' + name, mode='w') as tmp_output:
+        popenAndCall(on_exit, tmp_output, cmd)
 
 
-def popenAndCall(onExit, *popenArgs):
+def popenAndCall(onExit, tmp_out, *popenArgs):
     """
     Runs the given args in a subprocess.Popen, and then calls the function
     onExit when the subprocess completes.
@@ -80,17 +77,25 @@ def popenAndCall(onExit, *popenArgs):
     would give to subprocess.Popen.
     """
 
-    def runInThread(onExit, popenArgs):
-        proc = subprocess.Popen(popenArgs)
+    def runInThread(onExit, tmp_out, popenArgs):
+        proc = subprocess.Popen(popenArgs, stderr=subprocess.STDOUT, stdout=tmp_out)
         proc.wait()
-        onExit()
+        onExit(tmp_out)
         return
 
-    process = multiprocessing.Process(target=runInThread, args=(onExit, *popenArgs))
+    process = multiprocessing.Process(target=runInThread, args=(onExit, tmp_out, *popenArgs))
     process.start()
     # returns immediately after the thread starts
     return process
 
 
-def on_exit():
-    print("On Exit...")
+def on_exit(file):
+    with open('/tmp/' + file, mode='r') as tmp_output:
+        content = tmp_output.readlines()
+    if file in content:
+        instance = JobModel.objects.get(name=file)
+        print(instance)
+        instance.embryonic = False
+        instance.save()
+    else:
+        print(file, content)
