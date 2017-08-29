@@ -8,4 +8,4 @@ class JobModel(models.Model):
     schema = models.CharField(max_length=20480)
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
-    embryonic = models.BooleanField(default=True)
+    finalized = models.BooleanField(default=False)

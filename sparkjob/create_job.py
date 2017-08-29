@@ -22,7 +22,7 @@ switcher = {
 def create_df_job(name, path, schema, header):
     spark = SparkSession.builder.appName(name).enableHiveSupport().getOrCreate()
     fields = []
-    schema = schema.replace('\'', '"')
+    schema = schema.replace('\'', '\"')
     cols = json.loads(schema)
     for col in cols:
         col_type = switcher.get(col.get('type'))
@@ -41,8 +41,4 @@ if __name__ == '__main__':
     name = sys.argv[1]
     path = sys.argv[2]
     schema = sys.argv[3]
-    # header = sys.argv[4] if sys.argv[4] else True
-    print(name)
-    print(path)
-    print(schema)
     create_df_job(name, path, schema, True)

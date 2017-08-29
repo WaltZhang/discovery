@@ -57,33 +57,30 @@ def entity_detail(request, id):
 
 def create_job(job_py, name, path, schema):
     schema_str = json.dumps(schema)
-    # schema_str = schema_str.replace('\'', '\\\\\"')
     cmd = [os.path.join(settings.SPARK_HOME, 'bin/spark-submit'),
            '--master', settings.SPARK_MASTER,
            '--name', name,
            job_py, name,
            'file:' + path,
            '' + schema_str + '']
-    # popenAndCall(on_exit, cmd)
     with open('/tmp/' + name, mode='w') as tmp_output:
-        popenAndCall(on_exit, tmp_output, cmd)
+        popenAndCall(on_exit, name, tmp_output, cmd)
 
 
-def popenAndCall(onExit, tmp_out, *popenArgs):
+def popenAndCall(onExit, file_name, tmp_out, *popenArgs):
     """
     Runs the given args in a subprocess.Popen, and then calls the function
     onExit when the subprocess completes.
     onExit is a callable object, and popenArgs is a list/tuple of args that
     would give to subprocess.Popen.
     """
-
-    def runInThread(onExit, tmp_out, popenArgs):
+    def runInThread(onExit, file_name, tmp_out, popenArgs):
         proc = subprocess.Popen(popenArgs, stderr=subprocess.STDOUT, stdout=tmp_out)
         proc.wait()
-        onExit(tmp_out)
+        onExit(file_name)
         return
 
-    process = multiprocessing.Process(target=runInThread, args=(onExit, tmp_out, *popenArgs))
+    process = multiprocessing.Process(target=runInThread, args=(onExit, file_name, tmp_out, *popenArgs))
     process.start()
     # returns immediately after the thread starts
     return process
@@ -92,10 +89,10 @@ def popenAndCall(onExit, tmp_out, *popenArgs):
 def on_exit(file):
     with open('/tmp/' + file, mode='r') as tmp_output:
         content = tmp_output.readlines()
-    if file in content:
+    if '|count(1)|\n' in content:
         instance = JobModel.objects.get(name=file)
-        print(instance)
-        instance.embryonic = False
+        instance.finalized = True
         instance.save()
+        print(instance.id, instance.name, instance.finalized)
     else:
         print(file, content)

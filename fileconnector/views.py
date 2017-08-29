@@ -21,7 +21,7 @@ def file_detail(request, id):
     context = {
         'instance': instance,
         'meta_str': meta,
-        'uuid': uuid.uuid1().replace('-', '_'),
+        'uuid': str(uuid.uuid1()).replace('-', '_'),
         'data': data
     }
     return render(request, 'fileconnector/file_detail.html', context)
