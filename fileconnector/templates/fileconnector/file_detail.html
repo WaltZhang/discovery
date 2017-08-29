@@ -2,9 +2,10 @@
 {% block body %}
     <form method="post" action="{% url 'spark:list' %}">
         {% csrf_token %}
-        <textarea id="metadata" name="metadata">{{ meta_str }}</textarea><br>
-        <input type="type" id="description" name="description" value="{{ instance.description }}"><br>
-        <input type="type" id="file" name="file" value="{{ instance.file.name }}"><br>
+        <textarea id="schema" name="schema">{{ meta_str }}</textarea><br>
+        <input type="text" id="description" name="description" value="{{ instance.description }}"><br>
+        <input type="text" id="file" name="file" value="{{ instance.file.name }}"><br>
+        <input type="text" id="name" name="name" value="{{ uuid }}"><br>
         <label id="data" name="data">{{ data }}</label><br>
         <input type="submit" value="Create Data Set"><br>
     </form>

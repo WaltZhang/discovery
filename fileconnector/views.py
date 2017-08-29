@@ -25,6 +25,7 @@ def file_detail(request, id):
     context = {
         'instance': instance,
         'meta_str': meta,
+        'uuid': uuid.uuid1(),
         'data': data
     }
     return render(request, 'fileconnector/file_detail.html', context)

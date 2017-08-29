@@ -19,7 +19,7 @@ switcher = {
 }
 
 
-def create_df_job(name, path, schema):
+def create_df_job(name, path, schema, header):
     spark = SparkSession.builder.appName(name).enableHiveSupport().getOrCreate()
     fields = []
     text = json.loads(schema)
@@ -30,19 +30,20 @@ def create_df_job(name, path, schema):
             type = title.get('type')
         field = StructField(title.get('name'), type())
         fields.append(field)
-    df = spark.read.csv(path, schema=StructType(fields))
+    df = spark.read.csv(path, schema=StructType(fields), header=header)
     df.printSchema()
     df.show()
     df.write.saveAsTable(name)
-    spark.sql('show databases').show()
     spark.sql('show tables').show()
+    spark.sql('select 1 from ' + name).show()
 
 
 if __name__ == '__main__':
     name = sys.argv[1]
     path = sys.argv[2]
     schema = sys.argv[3]
+    header = sys.argv[4] if sys.argv[4] else True
     print(name)
     print(path)
     print(schema)
-    create_df_job(name, path, schema)
+    create_df_job(name, path, schema, header)
