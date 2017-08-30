@@ -51,8 +51,17 @@ def entity_detail(request, id):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
+        delete_job(os.path.join(settings.BASE_DIR, 'sparkjob/delete_job.py'), entity.name)
         entity.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def delete_job(job_py, name):
+    cmd = [os.path.join(settings.SPARK_HOME, 'bin/spark-submit'),
+           '--master', settings.SPARK_MASTER,
+           '--name', name,
+           job_py, name]
+    subprocess.Popen(cmd)
 
 
 def create_job(job_py, name, path, schema):
@@ -87,12 +96,14 @@ def popenAndCall(onExit, file_name, tmp_out, *popenArgs):
 
 
 def on_exit(file):
-    with open('/tmp/' + file, mode='r') as tmp_output:
+    path = os.path.join('/tmp', file)
+    with open(path, mode='r') as tmp_output:
         content = tmp_output.readlines()
     if '|count(1)|\n' in content:
         instance = JobModel.objects.get(name=file)
         instance.finalized = True
         instance.save()
         print(instance.id, instance.name, instance.finalized)
+        os.remove(path)
     else:
         print(file, content)
