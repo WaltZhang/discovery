@@ -21,7 +21,8 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^files/', include('fileconnector.urls', namespace='files')),
-    url(r'^spark/', include('sparkjob.urls', namespace='spark'))
+    url(r'^spark/', include('sparkjob.urls', namespace='spark')),
+    url(r'^connectors/', include('dbconnector.urls', namespace='connector'))
 ]
 
 if settings.DEBUG:
