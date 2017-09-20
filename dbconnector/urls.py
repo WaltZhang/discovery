@@ -1,8 +1,10 @@
 from django.conf.urls import url
 
-from dbconnector.viewsets import connector_detail, connector_list
+from dbconnector import views
+from dbconnector import viewsets
 
 urlpatterns = [
-    url(r'^$', connector_list, name='list'),
-    url(r'^(?P<id>\d+)/$', connector_detail, name='detail'),
+    url(r'^$', views.connector_list, name='list'),
+    url(r'^api/$', viewsets.connector_list),
+    url(r'^api/(?P<id>\d+)/$', viewsets.connector_detail),
 ]
