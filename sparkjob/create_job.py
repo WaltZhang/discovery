@@ -59,9 +59,17 @@ class SparkManager(object):
 
             def save(self):
                 connector = self.get_connector()
-                jdbc_url = "jdbc:mysql://{0}:{1}/{2}".format(connector.get('host'), connector.get('port'), connector.get('db'))
+                jdbc_url = "jdbc:mysql://{0}:{1}/{2}?user={3}&password={4}".format(
+                    connector.get('host'),
+                    connector.get('port'),
+                    connector.get('db'),
+                    connector.get('user'),
+                    connector.get('password')
+                )
                 spark = SparkSession.builder.appName(self.name).enableHiveSupport().getOrCreate()
-
+                df = spark.read.jdbc(url=jdbc_url, table=self.table)
+                df.write.saveAsTable(self.name)
+                spark.sql('select count(*) from ' + self.name).show()
 
             def get_connector(self):
                 url = "http://localhost:8080/connectors/api/" + self.connector_id
