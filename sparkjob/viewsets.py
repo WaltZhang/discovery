@@ -1,4 +1,3 @@
-import json
 import multiprocessing
 import os
 import subprocess
@@ -27,8 +26,9 @@ def entity_list(request):
             schema = serializer.data.get('schema')
             file = serializer.data.get('file')
 
-            create_job(os.path.join(settings.BASE_DIR, 'sparkjob/create_job.py'), name,
-                       os.path.join(settings.MEDIA_ROOT, file), schema)
+            # create_job(os.path.join(settings.BASE_DIR, 'sparkjob/create_job.py'), name,
+            #            os.path.join(settings.MEDIA_ROOT, file), schema)
+            create_spark_job(name, os.path.join(settings.MEDIA_ROOT, file), schema)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -64,38 +64,46 @@ def delete_job(job_py, name):
     subprocess.Popen(cmd)
 
 
-def create_job(job_py, name, path, schema):
-    schema_str = json.dumps(schema)
-    cmd = [os.path.join(settings.SPARK_HOME, 'bin/spark-submit'),
-           '--master', settings.SPARK_MASTER,
-           '--name', name,
-           job_py, name,
-           'file:' + path,
-           '' + schema_str + '']
+def create_spark_job(name, *args):
+    create_py = os.path.join(settings.BASE_DIR, 'sparkjob/create_job.py')
+    cmd = [create_py, '--master', settings.SPARK_MASTER, '--name', name]
+    cmd.extend(args)
     with open('/tmp/' + name, mode='w') as tmp_output:
-        popenAndCall(on_exit, name, tmp_output, cmd)
+        proc_call(on_complete, name, tmp_output, cmd)
 
 
-def popenAndCall(onExit, file_name, tmp_out, *popenArgs):
+# def create_job(job_py, name, path, schema):
+#     schema_str = json.dumps(schema)
+#     cmd = [os.path.join(settings.SPARK_HOME, 'bin/spark-submit'),
+#            '--master', settings.SPARK_MASTER,
+#            '--name', name,
+#            job_py, name,
+#            'file:' + path,
+#            '' + schema_str + '']
+#     with open('/tmp/' + name, mode='w') as tmp_output:
+#         proc_call(on_exit, name, tmp_output, cmd)
+
+
+def proc_call(on_complete, file_name, tmp_out, *proc_args):
     """
     Runs the given args in a subprocess.Popen, and then calls the function
     onExit when the subprocess completes.
     onExit is a callable object, and popenArgs is a list/tuple of args that
     would give to subprocess.Popen.
     """
-    def runInThread(onExit, file_name, tmp_out, popenArgs):
-        proc = subprocess.Popen(popenArgs, stderr=subprocess.STDOUT, stdout=tmp_out)
+    def run_in_thread(on_complete, file_name, tmp_out, proc_args):
+        proc = subprocess.Popen(proc_args, stderr=subprocess.STDOUT, stdout=tmp_out)
         proc.wait()
-        onExit(file_name)
+        on_complete(file_name)
         return
 
-    process = multiprocessing.Process(target=runInThread, args=(onExit, file_name, tmp_out, *popenArgs))
+    process = multiprocessing.Process(target=run_in_thread, args=(on_complete, file_name, tmp_out, *proc_args))
     process.start()
     # returns immediately after the thread starts
     return process
 
 
-def on_exit(file):
+def on_complete(file):
     path = os.path.join('/tmp', file)
     with open(path, mode='r') as tmp_output:
         content = tmp_output.readlines()
