@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 
 from fileconnector.models import FileModel
-from sparkjob.models import JobModel
+from sparkjob.models import CsvModel
 
 
 class FileConnectorModelAdmin(ModelAdmin):
@@ -15,8 +15,8 @@ class FileConnectorModelAdmin(ModelAdmin):
 class JobModelAdmin(ModelAdmin):
     list_display = ['name', 'description', 'schema', 'timestamp', 'updated']
     class Meta:
-        model = JobModel
+        model = CsvModel
 
 
 admin.site.register(FileModel, FileConnectorModelAdmin)
-admin.site.register(JobModel, JobModelAdmin)
+admin.site.register(CsvModel, JobModelAdmin)

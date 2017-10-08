@@ -1,9 +1,15 @@
 from rest_framework import serializers
 
-from sparkjob.models import JobModel
+from sparkjob.models import CsvModel, JdbcModel
 
 
-class JobSerializer(serializers.ModelSerializer):
+class CsvSerializer(serializers.ModelSerializer):
     class Meta:
-        model = JobModel
+        model = CsvModel
+        fields = '__all__'
+
+
+class JdbcSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JdbcModel
         fields = '__all__'

@@ -1,6 +1,6 @@
 {% extends 'fileconnector/base.html' %}
 {% block body %}
-    <form method="post" action="{% url 'spark:list' %}">
+    <form method="post" action="{% url 'spark:csv' %}">
         {% csrf_token %}
         <textarea id="schema" name="schema">{{ meta_str }}</textarea><br>
         <input type="text" id="description" name="description" value="{{ instance.description }}"><br>

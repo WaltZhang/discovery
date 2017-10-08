@@ -9,3 +9,7 @@ def connector_list(request):
         'object_list': object_list,
     }
     return render(request, 'dbconnector/connector_list.html', context)
+
+
+def connector_detail(request, id):
+    pass

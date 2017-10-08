@@ -22,7 +22,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^files/', include('fileconnector.urls', namespace='files')),
     url(r'^spark/', include('sparkjob.urls', namespace='spark')),
-    url(r'^connectors/', include('dbconnector.urls', namespace='connector'))
+    url(r'^connectors/', include('dbconnector.urls', namespace='connector')),
+    url(r'^inventory/', include('datainventory.urls', namespace='inventory')),
 ]
 
 if settings.DEBUG:
