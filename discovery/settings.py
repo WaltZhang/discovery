@@ -25,10 +25,10 @@ SECRET_KEY = '#e7p=$^5a!&&=xf1*qj$-3+@jkwhnn9w17gb%j#=c0on&23o02'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
-SPARK_HOME = '/localdisk/spark-2.1.0-bin-hadoop2.7'
+SPARK_HOME = '/Users/walt/Development/spark-2.1.0-bin-hadoop2.7'
 SPARK_MASTER = 'yarn'
 DATA_WAREHOUSE_HOME = 'hdfs:/data_lake/'
 # Application definition
@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'fileconnector.apps.FileconnectorConfig',
     'sparkjob.apps.SparkjobConfig',
+    'dbconnector.apps.DbConnectorConfig',
+    'datainventory.apps.DatainventoryConfig',
 ]
 
 MIDDLEWARE = [
