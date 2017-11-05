@@ -3,33 +3,29 @@
     <div class="albums-container container-fluid">
         <div class="row">
             {% if object_list %}
-                <ul>
                 {% for object in object_list %}
-                    <div class="col-sm-4 col-lg-2">
-                        <div class="thumbnail">
-                            <a href="#">
-                                <img src="#" class="img-responsive" >
-                            </a>
-                            <div class="caption">
-                                <h2>{{ object.name }}</h2>
-                                <h4>{{ dataset.schema }}</h4>
+                    <div class="col-sm-12 col-md-6 col-xl-4">
+                        <figure class="figure">
+                            <img src="http://www.runoob.com/wp-content/uploads/2014/06/kittens.jpg" class="figure-img img-fluid" >
+                            <figcaption class="figure-caption">
+                                <h5>{{ object.name }}</h5>
+                                <h4><small>{{ object.timestamp }}</small></h4>
 
                                 <!-- View Details -->
-                                <a href="#" class="btn btn-primary btn-sm" role="button">View DataSet</a>
+                                <a href="{% url 'inventory:data_detail' object.id %}" class="btn btn-primary btn-sm" role="button">View DataSet</a>
 
                                 <!-- Delete Album -->
                                 <form action="#" method="post" style="display: inline;">
                                     {% csrf_token %}
                                     <input type="hidden" name="dataset_id" value="{{ object.id }}" />
                                     <button type="submit" class="btn btn-default btn-sm">
-                                        <span class="glyphicon glyphicon-trash"></span>
+                                        <span class="fa fa-trash"></span>
                                     </button>
                                 </form>
-                            </div>
-                        </div>
+                            </figcaption>
+                        </figure>
                     </div>
                 {% endfor %}
-                </ul>
             {% else %}
                 <div class="col-sm-12">
                     <br>
