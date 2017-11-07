@@ -1,3 +1,10 @@
 from django.shortcuts import render
 
-# Create your views here.
+from services.models import ServiceModel
+
+
+def service_list(request):
+    object_list = ServiceModel.objects.all()
+    context = {
+        'object_list': object_list
+    }
