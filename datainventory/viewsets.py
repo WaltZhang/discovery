@@ -13,7 +13,6 @@ def inventory_list(request):
         serializer = InventorySerializer(object_list, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        print(request.data)
         serializer = InventorySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
