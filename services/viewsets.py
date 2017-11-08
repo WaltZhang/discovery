@@ -19,3 +19,23 @@ def service_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def service_detail(request, name):
+    try:
+        instance = ServiceModel.objects.get(name=name)
+    except ServiceModel.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = ServiceSerializer(instance=instance)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = ServiceSerializer(instance=instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'sparkjob.apps.SparkjobConfig',
     'dbconnector.apps.DbConnectorConfig',
     'datainventory.apps.DatainventoryConfig',
+    'services.apps.ServicesConfig',
 ]
 
 MIDDLEWARE = [

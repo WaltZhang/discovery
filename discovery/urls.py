@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^spark/', include('sparkjob.urls', namespace='spark')),
     url(r'^connectors/', include('dbconnector.urls', namespace='connector')),
     url(r'^inventory/', include('datainventory.urls', namespace='inventory')),
+    url(r'^services/', include('services.urls', namespace='services')),
 ]
 
 if settings.DEBUG:
