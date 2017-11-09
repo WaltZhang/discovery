@@ -5,6 +5,8 @@ import requests
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 
+from discovery import utils
+
 switcher = {
     'null': NullType,
     'bool': BooleanType,
@@ -73,10 +75,9 @@ class SparkManager(object):
                 spark.sql('select count(*) from ' + self.name).show()
 
             def get_connector(self):
-                url = "http://localhost:8080/connectors/api/" + self.connector_id
+                url = utils.get_service_url('connector')
                 print('url:', url)
                 response = requests.get(url)
-                print(response.text)
                 return json.loads(response.text)
 
         job_types = {"csv": CsvJob, "jdbc": JdbcJob}

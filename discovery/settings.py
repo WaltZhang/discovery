@@ -147,3 +147,7 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static_root')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media_root')
+
+SERVICE_PROTOCOL = 'http'
+SERVICE_HOST = 'localhost'
+SERVICE_PORT = 8080
