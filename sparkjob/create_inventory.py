@@ -6,10 +6,15 @@ from pyspark.sql import SparkSession
 from discovery import utils
 
 
-def query_schema_job(name):
+def query_data(name):
     spark = SparkSession.builder.appName(name).enableHiveSupport().getOrCreate()
-    df = spark.sql('SELECT * FROM {}'.format(name))
-    return df.dtypes
+    return spark.sql('SELECT * FROM {}'.format(name))
+
+
+def create_sample(df, name):
+    if df.count() > 100000:
+        df = df.limit(100000)
+    df.write.csv("/tmp/" + name)
 
 
 def format_schema(dtypes):
@@ -20,8 +25,9 @@ def format_schema(dtypes):
 
 
 def create_inventory(name):
-    dtypes = query_schema_job(name)
-    schema = format_schema(dtypes)
+    df = query_data(name)
+    create_sample(df, name)
+    schema = format_schema(df.dtypes)
     string = json.dumps(schema).replace('\'', '\"')
     url = utils.get_service_url('inventory')
     context = {
@@ -33,5 +39,4 @@ def create_inventory(name):
 
 if __name__ == '__main__':
     name = sys.argv[1]
-    print(name)
     create_inventory(name)

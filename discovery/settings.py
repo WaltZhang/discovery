@@ -29,6 +29,7 @@ ALLOWED_HOSTS = ['localhost']
 
 
 SPARK_HOME = '/Users/walt/Development/spark-2.1.0-bin-hadoop2.7'
+HADOOP_HOME = '/Users/walt/Development/hadoop-2.7.3'
 SPARK_MASTER = 'yarn'
 DATA_WAREHOUSE_HOME = 'hdfs:/data_lake/'
 # Application definition
