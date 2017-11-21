@@ -36,6 +36,7 @@ class SparkManager(object):
                 self.path = args[0]
                 self.schema = args[1]
                 self.name = args[2]
+                self.delimiter = args[3]
 
             def save(self):
                 spark = SparkSession.builder.appName(self.name).enableHiveSupport().getOrCreate()
@@ -48,7 +49,7 @@ class SparkManager(object):
                         col_type = col.get('type')
                     field = StructField(col.get('name'), col_type())
                     fields.append(field)
-                df = spark.read.csv(self.path, schema=StructType(fields), header=True)
+                df = spark.read.csv(self.path, schema=StructType(fields), header=True, sep=self.delimiter)
                 df.printSchema()
                 df.show()
                 df.write.saveAsTable(self.name)

@@ -6,6 +6,7 @@ class CsvModel(models.Model):
     description = models.TextField()
     file = models.CharField(max_length=512)
     schema = models.CharField(max_length=20480)
+    delimiter = models.CharField(max_length=1, default=',')
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
     finalized = models.BooleanField(default=False)

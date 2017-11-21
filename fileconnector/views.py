@@ -17,12 +17,15 @@ def file_list(request):
 
 def file_detail(request, id):
     instance = get_object_or_404(FileModel, id=id)
-    meta, data = read_csv(instance.file.path)
+    delimiter = request.GET.get('delimiter', ',')
+    meta, data = read_csv(instance.file.path, delimiter)
     context = {
+        'id': id,
         'instance': instance,
         'meta_str': meta,
         'uuid': str(uuid.uuid1()).replace('-', '_'),
-        'data': data
+        'data': data,
+        'delimiter': delimiter
     }
     return render(request, 'fileconnector/file_detail.html', context)
 
@@ -52,12 +55,12 @@ def file_edit(request, id):
     return render(request, 'fileconnector/form.html', context)
 
 
-def read_csv(path):
+def read_csv(path, delimiter):
     rows = []
     with open(path) as csv_file:
-        reader = csv.reader(csv_file)
+        reader = csv.reader(csv_file, delimiter=delimiter)
         header = next(reader)
         cols = [{'name': title, 'type': 'string'} for title in header]
         for row in csv_file:
-            rows.append(row)
+            rows.append(row.split(delimiter))
         return cols, rows

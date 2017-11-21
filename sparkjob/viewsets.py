@@ -25,8 +25,9 @@ def csv_jobs(request):
             name = serializer.data.get('name')
             schema = serializer.data.get('schema')
             csv_file = serializer.data.get('file')
+            delimiter = serializer.data.get('delimiter')
 
-            create_spark_job(name, 'csv', 'file://' + os.path.join(settings.MEDIA_ROOT, csv_file), schema, name)
+            create_spark_job(name, 'csv', 'file://' + os.path.join(settings.MEDIA_ROOT, csv_file), schema, name, delimiter)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
