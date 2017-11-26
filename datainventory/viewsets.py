@@ -46,5 +46,5 @@ def inventory_detail(request, id):
 
 
 def copy_sample(name):
-    cmd = [settings.HADOOP_HOME + '/bin/hadoop', 'fs', '-get', 'hdfs:/tmp/' + name, '/tmp/']
+    cmd = [settings.HADOOP_HOME + '/bin/hadoop', 'fs', '-get', 'hdfs:/tmp/' + name + '/*.csv', '/tmp/' + name]
     subprocess.Popen(cmd)

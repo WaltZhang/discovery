@@ -3,10 +3,11 @@
 {% block body %}
 <h2>{{ instance.name }}</h2>
     <div class="container-fluid">
-    <ul class="pagination">
         <li>{{ instance.schema }}</li>
         <li>{{ instance.timestamp }}</li>
         <li>{{ instance.updated }}</li>
+        <li>{{ record }}</li>
+    <ul class="pagination">
     </ul>
     </div>
 {% endblock %}
