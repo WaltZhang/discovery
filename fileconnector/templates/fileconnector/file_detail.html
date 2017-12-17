@@ -1,16 +1,26 @@
-{% extends 'fileconnector/base.html' %}
+{% extends 'base.html' %}
 {% block body %}
     <form method="get" action="{% url 'files:detail' id %}">
         <input type="text" id="delimter" name="delimiter" value="{{ delimiter }}"><br>
         <input type="submit" value="Delimiter"><br>
     </form>
+    <label>{{ instance.file.name }}</label><br>
+    <label>{{ uuid }}</label><br>
+    <table class="table table-striped" id="sampleTable"><tbody></tbody></table>
     <form method="post" action="{% url 'spark:csv' %}">
         {% csrf_token %}
-        <textarea id="schema" name="schema">{{ meta_str }}</textarea><br>
+        <input type="hidden" id="file" name="file" value="{{ instance.file.name }}">
+        <input type="hidden" id="name" name="name" value="{{ uuid }}">
         <input type="text" id="description" name="description" value="{{ instance.description }}"><br>
-        <input type="text" id="file" name="file" value="{{ instance.file.name }}"><br>
-        <input type="text" id="name" name="name" value="{{ uuid }}"><br>
-        <label id="data" name="data">{{ data }}</label><br>
+        <input type="hidden" id="schema" name="schema" value="{{ schema_str }}">
+        <input type="hidden" id="data" value="{{ data }}">
         <input type="submit" value="Create Data Set"><br>
     </form>
+    <script type="text/javascript">
+        $(function() {
+            addTable($.parseJSON($("input#data").val()),
+                    $("table#sampleTable"),
+                    $("input#schema"));
+        });
+    </script>
 {% endblock %}

@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Connectors</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block body %}
 <form>
     {% for object in object_list %}
     <input type="radio" name="connector" value="{{ object.id }}">{{ object.name }}<br/>
     {% endfor %}
 
 </form>
-</body>
-</html>
+{% endblock %}

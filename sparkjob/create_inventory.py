@@ -11,29 +11,35 @@ def query_data(name):
     return spark.sql('SELECT * FROM {}'.format(name))
 
 
-def create_sample(df, name):
-    if df.count() > 100000:
-        df = df.limit(100000)
-    df.write.csv("/tmp/" + name)
+def create_sample(df):
+    rdd = df.toJSON()
+    sample = []
+    for e in rdd.take(1000):
+        sample.append(json.loads(e))
+    return sample
 
 
 def format_schema(dtypes):
-    schema = {}
+    schema_list = []
     for dtype in dtypes:
+        schema = {}
         schema[dtype[0]] = dtype[1]
-    return schema
+        schema_list.append(schema)
+    return schema_list
 
 
 def create_inventory(name):
     df = query_data(name)
-    create_sample(df, name)
+    sample_data = create_sample(df)
     schema = format_schema(df.dtypes)
-    string = json.dumps(schema).replace('\'', '\"')
-    url = utils.get_service_url('inventory')
+    schema_string = json.dumps(schema)
+    sample_string = json.dumps(sample_data)
     context = {
         "name": name,
-        "schema": string
+        "schema": schema_string,
+        "sample": sample_string
     }
+    url = utils.get_service_url('inventory')
     requests.post(url, json=context)
 
 

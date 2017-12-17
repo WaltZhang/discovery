@@ -1,7 +1,6 @@
 import json
 import sys
 
-import requests
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 
@@ -9,16 +8,19 @@ from discovery import utils
 
 switcher = {
     'null': NullType,
-    'bool': BooleanType,
-    'byte': ByteType,
-    'short': ShortType,
-    'integer': IntegerType,
-    'long': LongType,
+    'boolean': BooleanType,
+    'tinyint': ByteType,
+    'smallint': ShortType,
+    'int': IntegerType,
+    'bigint': LongType,
     'float': FloatType,
     'double': DoubleType,
     'date': DateType,
     'timestamp': TimestampType,
     'string': StringType,
+    'decimal': DecimalType,
+    'array': ArrayType,
+    'map': MapType
 }
 
 
@@ -29,26 +31,25 @@ class SparkJob:
 
 class SparkManager(object):
     @classmethod
-    def factory(cls, source_type, *args):
+    def factory(cls, source_type, *job_args):
         class CsvJob(SparkJob):
-            def __init__(self, *args):
-                print(args)
-                self.path = args[0]
-                self.schema = args[1]
-                self.name = args[2]
-                self.delimiter = args[3]
+            def __init__(self, *csv_args):
+                self.path = csv_args[0]
+                self.schema = csv_args[1]
+                self.name = csv_args[2]
+                self.delimiter = csv_args[3]
 
             def save(self):
                 spark = SparkSession.builder.appName(self.name).enableHiveSupport().getOrCreate()
                 fields = []
-                schema = self.schema.replace('\'', '\"')
-                cols = json.loads(schema)
+                cols = json.loads(self.schema)
                 for col in cols:
-                    col_type = switcher.get(col.get('type'))
-                    if col_type is None:
-                        col_type = col.get('type')
-                    field = StructField(col.get('name'), col_type())
-                    fields.append(field)
+                    for k, v in col.items():
+                        col_type = switcher.get(v)
+                        if col_type is None:
+                            col_type = StringType
+                        field = StructField(k, col_type())
+                        fields.append(field)
                 df = spark.read.csv(self.path, schema=StructType(fields), header=True, sep=self.delimiter)
                 df.printSchema()
                 df.show()
@@ -56,13 +57,13 @@ class SparkManager(object):
                 spark.sql('select count(*) from ' + self.name).show()
 
         class JdbcJob(SparkJob):
-            def __init__(self, *args):
-                self.connector_id = args[0]
-                self.table = args[1]
-                self.name = args[2]
+            def __init__(self, *jdbc_args):
+                self.connector_id = jdbc_args[0]
+                self.table = jdbc_args[1]
+                self.name = jdbc_args[2]
 
             def save(self):
-                connector = self.get_connector()
+                connector = utils.get_connector()
                 jdbc_url = "jdbc:mysql://{0}:{1}/{2}?user={3}&password={4}".format(
                     connector.get('host'),
                     connector.get('port'),
@@ -75,68 +76,11 @@ class SparkManager(object):
                 df.write.saveAsTable(self.name)
                 spark.sql('select count(*) from ' + self.name).show()
 
-            def get_connector(self):
-                url = utils.get_service_url('connector')
-                print('url:', url)
-                response = requests.get(url)
-                return json.loads(response.text)
-
         job_types = {"csv": CsvJob, "jdbc": JdbcJob}
 
         if source_type in job_types:
-            return job_types[source_type](*args)
+            return job_types[source_type](*job_args)
         return None
-
-
-# class CsvJob(SparkJob):
-#     def __init__(self, *args):
-#         self.path = args[0]
-#         self.schema = args[1]
-#         self.name = args[2]
-#
-#     def save(self):
-#         spark = SparkSession.builder.enableHiveSupport().getOrCreate()
-#         fields = []
-#         schema = self.schema.replace('\'', '\"')
-#         cols = json.loads(schema)
-#         for col in cols:
-#             col_type = switcher.get(col.get('type'))
-#             if col_type is None:
-#                 col_type = col.get('type')
-#             field = StructField(col.get('name'), col_type())
-#             fields.append(field)
-#         df = spark.read.csv(self.path, schema=StructType(fields), header=True)
-#         df.printSchema()
-#         df.show()
-#         df.write.saveAsTable(self.name)
-#         spark.sql('select count(*) from ' + self.name).show()
-#
-# class JdbcJob(SparkJob):
-#     def __init__(self, *args):
-#         self.connector_id = args[0]
-#         self.table = args[1]
-#         self.name = args[2]
-#
-#     def save(self):
-#         connector = self.get_connector()
-#         jdbc_url = "jdbc:mysql://{0}:{1}/{2}?user={3}&password={4}".format(
-#             connector.get('host'),
-#             connector.get('port'),
-#             connector.get('db'),
-#             connector.get('user'),
-#             connector.get('password')
-#         )
-#         spark = SparkSession.builder.enableHiveSupport().getOrCreate()
-#         df = spark.read.jdbc(url=jdbc_url, table=self.table)
-#         df.write.saveAsTable(self.name)
-#         spark.sql('select count(*) from ' + self.name).show()
-#
-#     def get_connector(self):
-#         url = "http://localhost:8080/connectors/api/" + self.connector_id
-#         response = requests.get(url)
-#         return json.loads(response.text)
-#
-# job_types = {"csv": CsvJob, "jdbc": JdbcJob}
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-{% extends 'datainventory/base.html' %}
+{% extends 'base.html' %}
 
 {% block body %}
 <h2>{{ instance.name }}</h2>
@@ -6,8 +6,15 @@
         <li>{{ instance.schema }}</li>
         <li>{{ instance.timestamp }}</li>
         <li>{{ instance.updated }}</li>
-        <li>{{ record }}</li>
-    <ul class="pagination">
-    </ul>
+        <input type="hidden" id="schema" name="schema" value="{{ instance.schema }}">
+        <input type="text" id="sampleData" value="{{ instance.sample }}" size="200"><br>
+        <table class="table table-striped" id="sampleTable"><tbody></tbody></table>
     </div>
+    <script type="text/javascript">
+        $(function() {
+            addTable($.parseJSON($("input#sampleData").val()),
+                    $("table#sampleTable"),
+                    $("input#schema"));
+        });
+    </script>
 {% endblock %}

@@ -18,13 +18,13 @@ def file_list(request):
 def file_detail(request, id):
     instance = get_object_or_404(FileModel, id=id)
     delimiter = request.GET.get('delimiter', ',')
-    meta, data = read_csv(instance.file.path, delimiter)
+    schema, data = read_csv(instance.file.path, delimiter)
     context = {
         'id': id,
         'instance': instance,
-        'meta_str': meta,
+        'schema_str': json.dumps(schema),
         'uuid': str(uuid.uuid1()).replace('-', '_'),
-        'data': data,
+        'data': json.dumps(data),
         'delimiter': delimiter
     }
     return render(request, 'fileconnector/file_detail.html', context)
@@ -56,11 +56,11 @@ def file_edit(request, id):
 
 
 def read_csv(path, delimiter):
-    rows = []
     with open(path) as csv_file:
         reader = csv.reader(csv_file, delimiter=delimiter)
         header = next(reader)
-        cols = [{'name': title, 'type': 'string'} for title in header]
+        cols = [{title: 'string'} for title in header]
+        rows = []
         for row in csv_file:
-            rows.append(row.split(delimiter))
+            rows.append(dict(zip(header, row.split(delimiter))))
         return cols, rows

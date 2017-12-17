@@ -1,4 +1,5 @@
 import requests
+import json
 
 from discovery import settings
 
@@ -12,3 +13,10 @@ def get_service_url(service):
     )
     response = requests.get(url)
     return response.json().get('url')
+
+
+def get_connector():
+    url = get_service_url('connector')
+    print('url:', url)
+    response = requests.get(url)
+    return json.loads(response.text)

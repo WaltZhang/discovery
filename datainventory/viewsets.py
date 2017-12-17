@@ -20,7 +20,7 @@ def inventory_list(request):
         if serializer.is_valid():
             serializer.save()
             print(request.data.get('name'))
-            copy_sample(request.data.get('name'))
+            print(request.data.get('sample'))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -44,7 +44,7 @@ def inventory_detail(request, id):
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-def copy_sample(name):
-    cmd = [settings.HADOOP_HOME + '/bin/hadoop', 'fs', '-get', 'hdfs:/tmp/' + name + '/*.csv', '/tmp/' + name]
-    subprocess.Popen(cmd)
+#
+# def copy_sample(name):
+#     cmd = [settings.HADOOP_HOME + '/bin/hadoop', 'fs', '-get', 'hdfs:/tmp/' + name + '/*.csv', '/tmp/' + name]
+#     subprocess.Popen(cmd)
