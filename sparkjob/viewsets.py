@@ -2,6 +2,8 @@ import multiprocessing
 import os
 import subprocess
 
+from django.shortcuts import redirect
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -28,7 +30,8 @@ def csv_jobs(request):
             delimiter = serializer.data.get('delimiter')
 
             create_spark_job(name, 'csv', 'file://' + os.path.join(settings.MEDIA_ROOT, csv_file), schema, name, delimiter)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return redirect(reverse('inventory:data_list'))
+            # return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -117,15 +120,3 @@ def create_inventory(name):
            '--name', name,
            query_py, name]
     subprocess.Popen(cmd)
-
-    # path = os.path.join('/tmp', file)
-    # with open(path, mode='r') as tmp_output:
-    #     content = tmp_output.readlines()
-    # if '|count(1)|\n' in content:
-    #     instance = CsvModel.objects.get(name=file)
-    #     instance.finalized = True
-    #     instance.save()
-    #     print(instance.id, instance.name, instance.finalized)
-    #     os.remove(path)
-    # else:
-    #     print(file, content)

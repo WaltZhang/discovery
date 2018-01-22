@@ -7,14 +7,6 @@ from fileconnector.forms import FileForm
 from fileconnector.models import FileModel
 
 
-def file_list(request):
-    queryset = FileModel.objects.all()
-    context = {
-        'object_list': queryset
-    }
-    return render(request, 'fileconnector/file_list.html', context)
-
-
 def file_detail(request, id):
     instance = get_object_or_404(FileModel, id=id)
     delimiter = request.GET.get('delimiter', ',')
@@ -42,6 +34,25 @@ def file_upload(request):
     return render(request, 'fileconnector/form.html', context)
 
 
+def read_csv(path, delimiter):
+    with open(path) as csv_file:
+        reader = csv.reader(csv_file, delimiter=delimiter)
+        header = next(reader)
+        cols = [{title: 'string'} for title in header]
+        rows = []
+        for row in csv_file:
+            rows.append(dict(zip(header, row.split(delimiter))))
+        return cols, rows
+
+def file_list(request):
+    queryset = FileModel.objects.all()
+    context = {
+        'object_list': queryset
+    }
+    return render(request, 'fileconnector/file_list.html', context)
+
+
+
 def file_edit(request, id):
     instance = get_object_or_404(FileModel, id=id)
     form = FileForm(request.POST or None, request.FILES or None, instance=instance)
@@ -53,14 +64,3 @@ def file_edit(request, id):
         'form': form
     }
     return render(request, 'fileconnector/form.html', context)
-
-
-def read_csv(path, delimiter):
-    with open(path) as csv_file:
-        reader = csv.reader(csv_file, delimiter=delimiter)
-        header = next(reader)
-        cols = [{title: 'string'} for title in header]
-        rows = []
-        for row in csv_file:
-            rows.append(dict(zip(header, row.split(delimiter))))
-        return cols, rows

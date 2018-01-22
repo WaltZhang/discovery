@@ -4,26 +4,38 @@
         <div class="row">
             {% if object_list %}
                 {% for object in object_list %}
-                    <div class="col-sm-12 col-md-6 col-xl-4">
-                        <figure class="figure">
-                            <img src="http://www.runoob.com/wp-content/uploads/2014/06/kittens.jpg" class="figure-img img-fluid" >
-                            <figcaption class="figure-caption">
-                                <h5>{{ object.name }}</h5>
-                                <h4><small>{{ object.timestamp }}</small></h4>
-
-                                <!-- View Details -->
-                                <a href="{% url 'inventory:data_detail' object.id %}" class="btn btn-primary btn-sm" role="button">View DataSet</a>
-
-                                <!-- Delete Album -->
-                                <form action="#" method="post" style="display: inline;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="dataset_id" value="{{ object.id }}" />
-                                    <button type="submit" class="btn btn-default btn-sm">
-                                        <span class="fa fa-trash"></span>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <img class="card-img-top" src="http://www.runoob.com/wp-content/uploads/2014/06/kittens.jpg">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title">{{ object.name }}</h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <p class="card-text">{{ object.timestamp }}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <a href="{% url 'inventory:data_detail' object.id %}" class="btn btn-primary">
+                                        <span class="fa fa-bars"></span>
+                                    </a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <form action="#" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="dataset_id" value="{{ object.id }}" />
+                                            <span class="fa fa-trash-o"></span>
+                                        </form>
                                     </button>
-                                </form>
-                            </figcaption>
-                        </figure>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
