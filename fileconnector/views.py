@@ -29,6 +29,9 @@ def file_upload(request):
         instance.save()
         return redirect(reverse('files:detail', args=[instance.id]))
     context = {
+        'home_tab': '',
+        'file_tab': 'active',
+        'db_tab': '',
         'form': form
     }
     return render(request, 'fileconnector/form.html', context)

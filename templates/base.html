@@ -10,14 +10,14 @@
     <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     {% load staticfiles %}
-{#    <link rel="shortcut icon" type="image/png" href="{%  static 'favicon.ico' %}"/>#}
+    <link rel="shortcut icon" type="image/png" href="{%  static 'favicon.ico' %}"/>
     <script src="{% static 'datainventory/js/main.js' %}"></script>
 {#    <link rel="stylesheet" type="text/css" href="{% static 'discovery/style.css' %}"/>#}
 
 </head>
 <body>
 {% block navbar %}
-<nav class="navbar navbar-expand-sm navbar-dark bg-success">
+<nav class="navbar navbar-expand-sm navbar-dark bg-primary">
         <a class="navbar-brand" href="#">
             <img src="http://getbootstrap.com/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top">
             Navbar
@@ -29,13 +29,13 @@
 
         <div class="collapse navbar-collapse" id="navbarcollapseLink">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
+                <li class="nav-item {{ home_tab }}">
                     <a class="nav-link" href="/inventory/">Home</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item {{ file_tab }}">
                     <a class="nav-link" href="/files/upload">Upload file</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item {{ db_tab }}">
                     <a class="nav-link" href="/connectors/">Load Database</a>
                 </li>
             </ul>
