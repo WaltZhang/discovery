@@ -1,5 +1,4 @@
-import csv, json, uuid, requests
-from django.contrib.sites.shortcuts import get_current_site
+import csv, json, uuid
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 

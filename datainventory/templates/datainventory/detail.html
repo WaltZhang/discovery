@@ -10,6 +10,7 @@
         <input type="text" id="sampleData" value="{{ instance.sample }}" size="200"><br>
         <table class="table table-striped" id="sampleTable"><tbody></tbody></table>
     </div>
+    <a href="{% url 'inventory:data_list' %}" class="btn btn-primary">Data inventory</a>
     <script type="text/javascript">
         $(function() {
             addTable($.parseJSON($("input#sampleData").val()),

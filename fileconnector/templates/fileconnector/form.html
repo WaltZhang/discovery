@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% block body %}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Upload File">
-    </form>
+    <div class="col">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" class="btn btn-primary" value="Upload File">
+        </form>
+    </div>
 {% endblock %}
