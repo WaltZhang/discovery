@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'dbconnector.apps.DbConnectorConfig',
     'datainventory.apps.DatainventoryConfig',
     'services.apps.ServicesConfig',
+    'account.apps.AccountConfig',
 ]
 
 MIDDLEWARE = [

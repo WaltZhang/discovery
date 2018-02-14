@@ -1,4 +1,4 @@
-from django.forms import ModelForm, CharField, Textarea, ClearableFileInput, FileField
+from django.forms import ModelForm, CharField, Textarea, ClearableFileInput, FileField, NumberInput
 
 from fileconnector.models import FileModel
 

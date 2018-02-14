@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block body %}
+<h1>Register User</h1>
+<div class="colM">
+    <form method="post">
+        {% csrf_token %}
+        <p>First, enter a username and password. Then, you'll be able to edit more user options.</p>
+        <div>
+            {{ form.as_p }}
+        </div>
+        <input type="submit" value="Save" class="btn btn-info">
+    </form>
+</div>
+    {% endblock %}
